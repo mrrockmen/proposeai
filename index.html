@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProposeAI — Win More. Write Less.</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@300;400;500&family=Literata:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a0f1e;
+    --navy-mid: #111827;
+    --navy-light: #1a2540;
+    --cream: #f5f0e8;
+    --cream-dim: #e8e0d0;
+    --amber: #e8a020;
+    --amber-light: #f5c060;
+    --amber-dim: #b07818;
+    --teal: #1a9b8a;
+    --teal-light: #22c5ae;
+    --red-accent: #e84040;
+    --white: #ffffff;
+    --text-muted: #8892a4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--cream);
+    font-family: 'Literata', Georgia, serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--amber);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--amber);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    opacity: 0.5;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1.5rem 3rem;
+    display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(20px);
+    background: rgba(10,15,30,0.7);
+    border-bottom: 1px solid rgba(232,160,32,0.1);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--cream);
+    letter-spacing: -0.02em;
+  }
+  .nav-logo span { color: var(--amber); }
+  .nav-links {
+    display: flex; gap: 2.5rem; list-style: none;
+  }
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--amber); }
+  .nav-cta {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.6rem 1.4rem;
+    background: var(--amber);
+    color: var(--navy);
+    border: none;
+    font-weight: 500;
+    cursor: none;
+    transition: all 0.2s;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+  .nav-cta:hover { background: var(--amber-light); transform: translateY(-1px); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 70% 50%, rgba(232,160,32,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 10% 80%, rgba(26,155,138,0.06) 0%, transparent 60%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(232,160,32,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,160,32,0.04) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+
+  .hero-left {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 10rem 4rem 6rem 6rem;
+    position: relative; z-index: 2;
+  }
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 2rem; height: 1px;
+    background: var(--amber);
+    vertical-align: middle;
+    margin-right: 0.75rem;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.2rem, 5.5vw, 5.5rem);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.8rem;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.4s forwards;
+  }
+  .hero-title .line-accent { color: var(--amber); font-style: italic; }
+  .hero-title .line-outline {
+    -webkit-text-stroke: 1.5px var(--cream);
+    color: transparent;
+  }
+
+  .hero-sub {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--cream-dim);
+    max-width: 420px;
+    margin-bottom: 2.5rem;
+    font-weight: 300;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.6s forwards;
+  }
+
+  .hero-actions {
+    display: flex; gap: 1rem; align-items: center;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.8s forwards;
+  }
+  .btn-primary {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 1rem 2.2rem;
+    background: var(--amber);
+    color: var(--navy);
+    border: none;
+    font-weight: 500;
+    cursor: none;
+    position: relative;
+    overflow: hidden;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    transition: all 0.25s;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--amber-light);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  .btn-primary:hover::after { transform: translateX(0); }
+  .btn-primary span { position: relative; z-index: 1; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(232,160,32,0.3); }
+
+  .btn-ghost {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 1rem 2rem;
+    background: transparent;
+    color: var(--cream);
+    border: 1px solid rgba(245,240,232,0.2);
+    cursor: none;
+    transition: all 0.25s;
+  }
+  .btn-ghost:hover { border-color: var(--amber); color: var(--amber); }
+
+  .hero-stats {
+    display: flex; gap: 2.5rem;
+    margin-top: 3.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(245,240,232,0.1);
+    opacity: 0;
+    animation: fadeUp 0.9s 1s forwards;
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--amber);
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+  }
+
+  /* Hero right - animated proposal mockup */
+  .hero-right {
+    display: flex; align-items: center; justify-content: center;
+    padding: 8rem 4rem 4rem;
+    position: relative; z-index: 2;
+  }
+  .proposal-card {
+    width: 100%;
+    max-width: 420px;
+    background: rgba(26,37,64,0.8);
+    border: 1px solid rgba(232,160,32,0.2);
+    border-radius: 2px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(232,160,32,0.15);
+    overflow: hidden;
+    opacity: 0;
+    animation: fadeIn 1.2s 0.8s forwards, float 6s 2s ease-in-out infinite;
+  }
+  .card-topbar {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(10,15,30,0.6);
+    border-bottom: 1px solid rgba(232,160,32,0.1);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-r { background: var(--red-accent); }
+  .dot-y { background: var(--amber); }
+  .dot-g { background: var(--teal); }
+  .card-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-left: 0.5rem;
+    letter-spacing: 0.08em;
+  }
+  .card-body { padding: 1.5rem; }
+  .card-section {
+    margin-bottom: 1.2rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid rgba(245,240,232,0.06);
+  }
+  .card-section:last-child { border: none; margin: 0; padding: 0; }
+  .card-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.4rem;
+  }
+  .card-line {
+    height: 8px;
+    background: rgba(245,240,232,0.08);
+    border-radius: 1px;
+    margin: 0.35rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .card-line::after {
+    content: '';
+    position: absolute; top: 0; left: 0; bottom: 0;
+    background: linear-gradient(90deg, rgba(232,160,32,0.3), rgba(232,160,32,0.1));
+    border-radius: 1px;
+    animation: shimmer 2.5s ease-in-out infinite;
+  }
+  .card-line.w-full::after { width: 100%; }
+  .card-line.w-80::after { width: 80%; animation-delay: 0.2s; }
+  .card-line.w-60::after { width: 60%; animation-delay: 0.4s; }
+  .card-line.w-90::after { width: 90%; animation-delay: 0.1s; }
+  .card-price-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin: 0.3rem 0;
+  }
+  .card-price-label {
+    font-family: 'DM Mono', monospace; font-size: 0.65rem;
+    color: var(--text-muted);
+  }
+  .card-price-val {
+    font-family: 'DM Mono', monospace; font-size: 0.7rem;
+    color: var(--cream);
+  }
+  .card-total {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.6rem 0.8rem;
+    background: rgba(232,160,32,0.1);
+    border: 1px solid rgba(232,160,32,0.2);
+    margin-top: 0.5rem;
+  }
+  .card-total-label {
+    font-family: 'DM Mono', monospace; font-size: 0.65rem;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--amber);
+  }
+  .card-total-val {
+    font-family: 'Playfair Display', serif; font-size: 1.1rem;
+    font-weight: 700; color: var(--amber);
+  }
+  .card-gen-btn {
+    width: 100%; margin-top: 1rem;
+    padding: 0.75rem;
+    background: var(--amber);
+    color: var(--navy);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+    border: none;
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  }
+  .gen-pulse {
+    width: 6px; height: 6px;
+    background: var(--navy);
+    border-radius: 50%;
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+
+  /* FEATURES STRIP */
+  .features-strip {
+    padding: 5rem 6rem;
+    position: relative;
+  }
+  .features-strip::before {
+    content: '';
+    position: absolute; top: 0; left: 6rem; right: 6rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(232,160,32,0.3), transparent);
+  }
+  .strip-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  .features-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+  }
+  .feature-item {
+    padding: 2rem 2.5rem;
+    border-right: 1px solid rgba(245,240,232,0.07);
+    position: relative;
+    transition: background 0.3s;
+  }
+  .feature-item:last-child { border-right: none; }
+  .feature-item:hover { background: rgba(232,160,32,0.04); }
+  .feature-icon {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+  .feature-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--cream);
+    margin-bottom: 0.5rem;
+  }
+  .feature-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  /* HOW IT WORKS */
+  .how-section {
+    padding: 7rem 6rem;
+    background: var(--navy-mid);
+    position: relative;
+    overflow: hidden;
+  }
+  .how-section::before {
+    content: 'HOW';
+    position: absolute;
+    right: -2rem; top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Playfair Display', serif;
+    font-size: 18rem;
+    font-weight: 900;
+    color: rgba(232,160,32,0.025);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .section-header {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 5rem;
+    align-items: end;
+  }
+  .section-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 3.5vw, 3.2rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .section-title em { font-style: italic; color: var(--amber); }
+  .section-desc {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.8;
+    font-weight: 300;
+    align-self: end;
+  }
+  .steps-row {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(245,240,232,0.06);
+  }
+  .step {
+    background: var(--navy-mid);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .step::before {
+    content: attr(data-num);
+    position: absolute;
+    right: 1.5rem; top: 1rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    font-weight: 900;
+    color: rgba(232,160,32,0.07);
+    line-height: 1;
+  }
+  .step-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--amber);
+    margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .step-num::after { content: ''; flex: 1; height: 1px; background: rgba(232,160,32,0.2); }
+  .step-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+    color: var(--cream);
+  }
+  .step-desc {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* PRICING */
+  .pricing-section {
+    padding: 8rem 6rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .pricing-section::after {
+    content: '';
+    position: absolute;
+    top: 20%; left: -10%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(26,155,138,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .pricing-header {
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+  .pricing-header .section-title { margin-bottom: 1rem; }
+  .pricing-header .section-desc { max-width: 500px; margin: 0 auto; }
+
+  .toggle-wrap {
+    display: flex; align-items: center; justify-content: center;
+    gap: 1rem; margin-bottom: 4rem;
+  }
+  .toggle-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    cursor: none;
+    transition: color 0.2s;
+  }
+  .toggle-label.active { color: var(--cream); }
+  .toggle {
+    width: 48px; height: 26px;
+    background: rgba(245,240,232,0.1);
+    border-radius: 13px;
+    position: relative;
+    cursor: none;
+    border: 1px solid rgba(232,160,32,0.2);
+    transition: background 0.3s;
+  }
+  .toggle.on { background: rgba(232,160,32,0.2); }
+  .toggle-thumb {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 18px; height: 18px;
+    background: var(--amber);
+    border-radius: 50%;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .toggle.on .toggle-thumb { transform: translateX(22px); }
+  .save-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: rgba(26,155,138,0.15);
+    border: 1px solid rgba(26,155,138,0.3);
+    color: var(--teal-light);
+    padding: 0.25rem 0.6rem;
+  }
+
+  .plans-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .plan-card {
+    background: var(--navy-light);
+    border: 1px solid rgba(245,240,232,0.08);
+    padding: 2.5rem;
+    position: relative;
+    transition: all 0.3s;
+    overflow: hidden;
+  }
+  .plan-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: transparent;
+    transition: background 0.3s;
+  }
+  .plan-card:hover { transform: translateY(-4px); border-color: rgba(232,160,32,0.2); }
+  .plan-card:hover::before { background: linear-gradient(90deg, transparent, var(--amber), transparent); }
+
+  .plan-card.featured {
+    background: linear-gradient(135deg, rgba(232,160,32,0.08) 0%, rgba(26,37,64,0.9) 100%);
+    border-color: rgba(232,160,32,0.3);
+  }
+  .plan-card.featured::before {
+    background: linear-gradient(90deg, transparent, var(--amber), transparent);
+  }
+  .featured-badge {
+    position: absolute; top: 1.5rem; right: 1.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: var(--amber);
+    color: var(--navy);
+    padding: 0.2rem 0.6rem;
+    font-weight: 500;
+  }
+
+  .plan-tier {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+  .plan-price {
+    display: flex; align-items: baseline; gap: 0.3rem;
+    margin-bottom: 0.5rem;
+  }
+  .price-currency {
+    font-family: 'DM Mono', monospace;
+    font-size: 1rem;
+    color: var(--amber);
+    font-weight: 500;
+  }
+  .price-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.2rem;
+    font-weight: 900;
+    color: var(--cream);
+    line-height: 1;
+    transition: all 0.3s;
+  }
+  .price-period {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+  .price-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    line-height: 1.5;
+    font-weight: 300;
+    min-height: 2.5rem;
+  }
+
+  .plan-divider {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(245,240,232,0.08), transparent);
+    margin-bottom: 1.5rem;
+  }
+
+  .plan-features { list-style: none; margin-bottom: 2rem; }
+  .plan-features li {
+    font-size: 0.85rem;
+    color: var(--cream-dim);
+    padding: 0.5rem 0;
+    display: flex; align-items: flex-start; gap: 0.75rem;
+    font-weight: 300;
+    line-height: 1.4;
+  }
+  .plan-features li::before {
+    content: '✦';
+    color: var(--amber);
+    font-size: 0.55rem;
+    flex-shrink: 0;
+    margin-top: 0.3rem;
+  }
+  .plan-features li.muted { color: var(--text-muted); }
+  .plan-features li.muted::before { color: rgba(136,146,164,0.4); }
+
+  .plan-btn {
+    width: 100%;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.9rem;
+    border: 1px solid rgba(232,160,32,0.3);
+    background: transparent;
+    color: var(--amber);
+    cursor: none;
+    font-weight: 500;
+    transition: all 0.25s;
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  }
+  .plan-btn:hover { background: rgba(232,160,32,0.1); border-color: var(--amber); }
+  .plan-btn.primary-btn {
+    background: var(--amber); color: var(--navy);
+    border-color: var(--amber);
+  }
+  .plan-btn.primary-btn:hover { background: var(--amber-light); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(232,160,32,0.25); }
+
+  /* COMPARISON TABLE */
+  .compare-section {
+    padding: 5rem 6rem 8rem;
+  }
+  .compare-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 2.5rem;
+    color: var(--cream);
+    text-align: center;
+  }
+  .compare-table {
+    width: 100%; max-width: 900px; margin: 0 auto;
+    border-collapse: collapse;
+  }
+  .compare-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(245,240,232,0.08);
+    color: var(--text-muted);
+    text-align: left;
+  }
+  .compare-table th:not(:first-child) { text-align: center; }
+  .compare-table td {
+    padding: 0.9rem 1.5rem;
+    border-bottom: 1px solid rgba(245,240,232,0.04);
+    font-size: 0.85rem;
+    color: var(--cream-dim);
+    font-weight: 300;
+  }
+  .compare-table td:not(:first-child) { text-align: center; }
+  .compare-table tr:hover td { background: rgba(232,160,32,0.03); }
+  .check { color: var(--amber); font-size: 0.9rem; }
+  .cross { color: rgba(136,146,164,0.3); font-size: 0.9rem; }
+  .compare-table .featured-col { color: var(--amber); }
+
+  /* TESTIMONIALS */
+  .testimonials {
+    padding: 7rem 6rem;
+    background: var(--navy-mid);
+    position: relative;
+  }
+  .testimonials-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 4rem;
+  }
+  .testimonial-card {
+    background: var(--navy-light);
+    border: 1px solid rgba(245,240,232,0.06);
+    padding: 2rem;
+    position: relative;
+  }
+  .testimonial-card::before {
+    content: '\201C';
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    color: rgba(232,160,32,0.15);
+    position: absolute;
+    top: 0.5rem; left: 1.2rem;
+    line-height: 1;
+  }
+  .testimonial-text {
+    font-size: 0.9rem;
+    line-height: 1.75;
+    color: var(--cream-dim);
+    margin-bottom: 1.5rem;
+    font-style: italic;
+    font-weight: 300;
+    padding-top: 1.5rem;
+  }
+  .testimonial-author {
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+  .author-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--amber-dim), var(--teal));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--navy);
+    font-weight: 500;
+  }
+  .author-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    color: var(--cream);
+  }
+  .author-role {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    margin-top: 0.1rem;
+  }
+  .star-row {
+    display: flex; gap: 2px; margin-bottom: 0.5rem;
+    color: var(--amber); font-size: 0.65rem;
+    letter-spacing: 0.1em;
+  }
+
+  /* FAQ */
+  .faq-section {
+    padding: 7rem 6rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .faq-item {
+    border-bottom: 1px solid rgba(245,240,232,0.07);
+    padding: 1.75rem 0;
+    cursor: none;
+  }
+  .faq-q {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--cream);
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 1rem;
+  }
+  .faq-arrow {
+    color: var(--amber);
+    font-size: 1.2rem;
+    transition: transform 0.3s;
+    flex-shrink: 0;
+  }
+  .faq-item.open .faq-arrow { transform: rotate(45deg); }
+  .faq-a {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.8;
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.4s ease, margin 0.3s;
+    font-weight: 300;
+  }
+  .faq-item.open .faq-a { max-height: 200px; margin-top: 1rem; }
+
+  /* CTA SECTION */
+  .cta-section {
+    padding: 8rem 6rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse, rgba(232,160,32,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cta-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 4.5vw, 4.5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+  }
+  .cta-title em { font-style: italic; color: var(--amber); }
+  .cta-sub {
+    font-size: 1rem;
+    color: var(--text-muted);
+    max-width: 400px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+  .cta-actions { display: flex; gap: 1rem; justify-content: center; }
+  .cta-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-top: 1.5rem;
+    text-transform: uppercase;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 3rem 6rem;
+    border-top: 1px solid rgba(245,240,232,0.07);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--cream);
+  }
+  .footer-logo span { color: var(--amber); }
+  .footer-links {
+    display: flex; gap: 2rem; list-style: none;
+  }
+  .footer-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--amber); }
+  .footer-copy {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+    color: rgba(136,146,164,0.4);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+  @keyframes shimmer {
+    0% { opacity: 0.4; }
+    50% { opacity: 1; }
+    100% { opacity: 0.4; }
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.6; }
+  }
+
+  /* SCROLL REVEAL */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .hero-left { padding: 8rem 2rem 4rem; }
+    nav { padding: 1.2rem 2rem; }
+    .nav-links { display: none; }
+    .features-grid { grid-template-columns: 1fr 1fr; }
+    .plans-grid { grid-template-columns: 1fr; max-width: 400px; }
+    .features-strip, .how-section, .pricing-section, .compare-section,
+    .testimonials, .faq-section, .cta-section { padding-left: 2rem; padding-right: 2rem; }
+    .steps-row { grid-template-columns: 1fr; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .section-header { grid-template-columns: 1fr; gap: 1.5rem; }
+    footer { flex-direction: column; gap: 1.5rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Propose<span>AI</span></div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">How it Works</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#faq">FAQ</a></li>
+  </ul>
+  <button class="nav-cta">Start Free</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+
+  <div class="hero-left">
+    <p class="hero-eyebrow">AI Proposal Generator</p>
+    <h1 class="hero-title">
+      Win More.<br>
+      <span class="line-accent">Write Less.</span><br>
+      <span class="line-outline">Close Faster.</span>
+    </h1>
+    <p class="hero-sub">ProposeAI generates stunning, personalized client proposals in under 60 seconds — so you spend more time on what actually matters.</p>
+    <div class="hero-actions">
+      <button class="btn-primary"><span>Generate Free Proposal →</span></button>
+      <button class="btn-ghost">Watch Demo</button>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">12k+</div>
+        <div class="stat-label">Proposals Sent</div>
+      </div>
+      <div>
+        <div class="stat-num">68%</div>
+        <div class="stat-label">Win Rate Lift</div>
+      </div>
+      <div>
+        <div class="stat-num">47s</div>
+        <div class="stat-label">Avg. Gen Time</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="proposal-card">
+      <div class="card-topbar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <span class="card-label">proposal_acme_corp.pdf — generating...</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section">
+          <div class="card-tag">Executive Summary</div>
+          <div class="card-line w-full"></div>
+          <div class="card-line w-80"></div>
+          <div class="card-line w-90"></div>
+          <div class="card-line w-60"></div>
+        </div>
+        <div class="card-section">
+          <div class="card-tag">Scope of Work</div>
+          <div class="card-line w-full"></div>
+          <div class="card-line w-70"></div>
+          <div class="card-line w-80"></div>
+        </div>
+        <div class="card-section">
+          <div class="card-tag">Investment</div>
+          <div class="card-price-row">
+            <span class="card-price-label">Brand Strategy</span>
+            <span class="card-price-val">$4,200</span>
+          </div>
+          <div class="card-price-row">
+            <span class="card-price-label">Web Design</span>
+            <span class="card-price-val">$8,500</span>
+          </div>
+          <div class="card-price-row">
+            <span class="card-price-label">Development</span>
+            <span class="card-price-val">$12,000</span>
+          </div>
+          <div class="card-total">
+            <span class="card-total-label">Total Investment</span>
+            <span class="card-total-val">$24,700</span>
+          </div>
+        </div>
+        <button class="card-gen-btn">
+          <div class="gen-pulse"></div>
+          AI Generating...
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES STRIP -->
+<section class="features-strip" id="features">
+  <p class="strip-label">Everything you need to close</p>
+  <div class="features-grid">
+    <div class="feature-item reveal">
+      <span class="feature-icon">⚡</span>
+      <div class="feature-title">Instant Generation</div>
+      <div class="feature-desc">From brief to polished proposal in under 60 seconds. No writer's block, no blank page.</div>
+    </div>
+    <div class="feature-item reveal reveal-delay-1">
+      <span class="feature-icon">🎯</span>
+      <div class="feature-title">Smart Personalization</div>
+      <div class="feature-desc">AI tailors tone, structure, and pricing sections to each client's industry and needs.</div>
+    </div>
+    <div class="feature-item reveal reveal-delay-2">
+      <span class="feature-icon">📐</span>
+      <div class="feature-title">Pro Templates</div>
+      <div class="feature-desc">50+ industry-specific templates designed to convert — agency, consulting, SaaS, and more.</div>
+    </div>
+    <div class="feature-item reveal reveal-delay-3">
+      <span class="feature-icon">📊</span>
+      <div class="feature-title">Proposal Analytics</div>
+      <div class="feature-desc">See exactly when clients open, how long they read, and which sections get attention.</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="section-header">
+    <div>
+      <div class="section-eyebrow">Process</div>
+      <h2 class="section-title">Three steps to your <em>winning</em> proposal</h2>
+    </div>
+    <p class="section-desc">No lengthy onboarding. No complex setup. Just describe your project, review the output, and send — ProposeAI handles everything in between.</p>
+  </div>
+  <div class="steps-row">
+    <div class="step reveal" data-num="01">
+      <div class="step-num">01</div>
+      <div class="step-title">Describe the Project</div>
+      <div class="step-desc">Tell ProposeAI about the client, deliverables, timeline, and budget. Takes about 2 minutes — or paste in your notes.</div>
+    </div>
+    <div class="step reveal reveal-delay-1" data-num="02">
+      <div class="step-num">02</div>
+      <div class="step-title">AI Builds Your Proposal</div>
+      <div class="step-desc">Our model writes a compelling narrative, scopes deliverables, structures pricing, and formats everything beautifully.</div>
+    </div>
+    <div class="step reveal reveal-delay-2" data-num="03">
+      <div class="step-num">03</div>
+      <div class="step-title">Send & Track</div>
+      <div class="step-desc">Share via a sleek link or export to PDF. Watch real-time as your client reads, and get notified the moment they're ready to sign.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div class="pricing-header reveal">
+    <div class="section-eyebrow" style="justify-content:center;display:flex">Pricing</div>
+    <h2 class="section-title">Simple. <em>Transparent.</em> Scalable.</h2>
+    <p class="section-desc">Every plan includes unlimited proposals. No hidden fees, no per-send charges.</p>
+  </div>
+
+  <div class="toggle-wrap reveal">
+    <span class="toggle-label active" id="monthlyLabel">Monthly</span>
+    <div class="toggle" id="billingToggle" onclick="toggleBilling()">
+      <div class="toggle-thumb"></div>
+    </div>
+    <span class="toggle-label" id="annualLabel">Annual</span>
+    <span class="save-badge">Save 30%</span>
+  </div>
+
+  <div class="plans-grid">
+    <!-- Starter -->
+    <div class="plan-card reveal">
+      <div class="plan-tier">Starter</div>
+      <div class="plan-price">
+        <span class="price-currency">$</span>
+        <span class="price-amount" data-monthly="0" data-annual="0">0</span>
+        <span class="price-period">/mo</span>
+      </div>
+      <p class="price-desc">Perfect for freelancers just getting started.</p>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>5 proposals per month</li>
+        <li>3 templates</li>
+        <li>PDF export</li>
+        <li>Basic analytics</li>
+        <li class="muted">Custom branding</li>
+        <li class="muted">E-signature</li>
+        <li class="muted">Priority support</li>
+      </ul>
+      <button class="plan-btn">Get Started Free →</button>
+    </div>
+
+    <!-- Pro (featured) -->
+    <div class="plan-card featured reveal reveal-delay-1">
+      <div class="featured-badge">Most Popular</div>
+      <div class="plan-tier">Pro</div>
+      <div class="plan-price">
+        <span class="price-currency">$</span>
+        <span class="price-amount" data-monthly="49" data-annual="34">49</span>
+        <span class="price-period">/mo</span>
+      </div>
+      <p class="price-desc">For agencies and consultants who pitch regularly.</p>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>Unlimited proposals</li>
+        <li>50+ premium templates</li>
+        <li>PDF + shareable link export</li>
+        <li>Full analytics + open tracking</li>
+        <li>Custom branding & logo</li>
+        <li>E-signature integration</li>
+        <li class="muted">Team collaboration</li>
+      </ul>
+      <button class="plan-btn primary-btn">Start Pro Trial →</button>
+    </div>
+
+    <!-- Agency -->
+    <div class="plan-card reveal reveal-delay-2">
+      <div class="plan-tier">Agency</div>
+      <div class="plan-price">
+        <span class="price-currency">$</span>
+        <span class="price-amount" data-monthly="129" data-annual="89">129</span>
+        <span class="price-period">/mo</span>
+      </div>
+      <p class="price-desc">For growing teams that need to scale closing.</p>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>Everything in Pro</li>
+        <li>Up to 10 team seats</li>
+        <li>Team templates & sharing</li>
+        <li>CRM integrations (HubSpot, Pipedrive)</li>
+        <li>White-label client portal</li>
+        <li>API access</li>
+        <li>Dedicated account manager</li>
+      </ul>
+      <button class="plan-btn">Start Agency Trial →</button>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON TABLE -->
+<section class="compare-section">
+  <h3 class="compare-title reveal">Compare plans in detail</h3>
+  <table class="compare-table reveal">
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>Starter</th>
+        <th class="featured-col">Pro</th>
+        <th>Agency</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Monthly proposals</td><td>5</td><td class="featured-col">Unlimited</td><td>Unlimited</td></tr>
+      <tr><td>Templates</td><td>3</td><td class="featured-col">50+</td><td>50+ custom</td></tr>
+      <tr><td>PDF Export</td><td><span class="check">✦</span></td><td><span class="check">✦</span></td><td><span class="check">✦</span></td></tr>
+      <tr><td>Shareable link</td><td><span class="cross">✕</span></td><td><span class="check">✦</span></td><td><span class="check">✦</span></td></tr>
+      <tr><td>Custom branding</td><td><span class="cross">✕</span></td><td><span class="check">✦</span></td><td><span class="check">✦</span></td></tr>
+      <tr><td>E-signature</td><td><span class="cross">✕</span></td><td><span class="check">✦</span></td><td><span class="check">✦</span></td></tr>
+      <tr><td>Open tracking</td><td><span class="cross">✕</span></td><td><span class="check">✦</span></td><td><span class="check">✦</span></td></tr>
+      <tr><td>Team seats</td><td>1</td><td class="featured-col">1</td><td>10</td></tr>
+      <tr><td>CRM integrations</td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="check">✦</span></td></tr>
+      <tr><td>API access</td><td><span class="cross">✕</span></td><td><span class="cross">✕</span></td><td><span class="check">✦</span></td></tr>
+      <tr><td>Priority support</td><td><span class="cross">✕</span></td><td><span class="check">✦</span></td><td><span class="check">✦</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="section-header" style="grid-template-columns:1fr;">
+    <div class="section-eyebrow">What clients say</div>
+    <h2 class="section-title" style="font-size:2.2rem">Real results from real users</h2>
+  </div>
+  <div class="testimonials-grid">
+    <div class="testimonial-card reveal">
+      <div class="star-row">★ ★ ★ ★ ★</div>
+      <p class="testimonial-text">I used to spend 4–5 hours crafting proposals. Now it takes me 10 minutes. My close rate went from 30% to over 60% in two months.</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">SL</div>
+        <div>
+          <div class="author-name">Sarah Lim</div>
+          <div class="author-role">Brand Consultant, Lim Studio</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-1">
+      <div class="star-row">★ ★ ★ ★ ★</div>
+      <p class="testimonial-text">The open tracking feature alone is worth the subscription. Knowing exactly when a client is reading lets me follow up at exactly the right moment.</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">MK</div>
+        <div>
+          <div class="author-name">Marcus Kwon</div>
+          <div class="author-role">Partner, Kwon Digital Agency</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-2">
+      <div class="star-row">★ ★ ★ ★ ★</div>
+      <p class="testimonial-text">ProposeAI understands context in a way I didn't think was possible. Every proposal feels genuinely written for that specific client.</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">RP</div>
+        <div>
+          <div class="author-name">Rachel Park</div>
+          <div class="author-role">Freelance UX Designer</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section" id="faq">
+  <div style="text-align:center; margin-bottom:3rem" class="reveal">
+    <div class="section-eyebrow" style="display:block">FAQ</div>
+    <h2 class="section-title">Questions, <em>answered</em></h2>
+  </div>
+  <div class="faq-item reveal" onclick="toggleFaq(this)">
+    <div class="faq-q">Is there a free trial? <span class="faq-arrow">+</span></div>
+    <div class="faq-a">Yes — the Starter plan is free forever with 5 proposals/month. Pro and Agency plans come with a 14-day free trial, no credit card required.</div>
+  </div>
+  <div class="faq-item reveal" onclick="toggleFaq(this)">
+    <div class="faq-q">Can I cancel anytime? <span class="faq-arrow">+</span></div>
+    <div class="faq-a">Absolutely. Cancel anytime from your dashboard with no fees or penalties. Your proposals remain accessible until the end of your billing period.</div>
+  </div>
+  <div class="faq-item reveal" onclick="toggleFaq(this)">
+    <div class="faq-q">How does the AI personalization work? <span class="faq-arrow">+</span></div>
+    <div class="faq-a">ProposeAI analyzes your project brief, the client's industry, and your previous winning proposals to generate content that's tailored — not generic. The more you use it, the smarter it gets.</div>
+  </div>
+  <div class="faq-item reveal" onclick="toggleFaq(this)">
+    <div class="faq-q">Can I use my own brand colors and logo? <span class="faq-arrow">+</span></div>
+    <div class="faq-a">Yes, on Pro and Agency plans. Upload your logo, set your brand colors, and choose fonts — every proposal looks unmistakably yours.</div>
+  </div>
+  <div class="faq-item reveal" onclick="toggleFaq(this)">
+    <div class="faq-q">What integrations are available? <span class="faq-arrow">+</span></div>
+    <div class="faq-a">Agency plans include HubSpot, Pipedrive, Notion, Slack, and Zapier. Pro users get Zapier access. Full REST API available on Agency plans.</div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="cta-title reveal">Your next proposal<br>writes <em>itself.</em></h2>
+  <p class="cta-sub reveal">Join 12,000+ freelancers and agencies already closing more with ProposeAI.</p>
+  <div class="cta-actions reveal">
+    <button class="btn-primary"><span>Generate Your First Proposal →</span></button>
+    <button class="btn-ghost">Talk to Sales</button>
+  </div>
+  <p class="cta-note reveal">No credit card required · Free forever plan available</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Propose<span>AI</span></div>
+  <ul class="footer-links">
+    <li><a href="#">Product</a></li>
+    <li><a href="#">Pricing</a></li>
+    <li><a href="#">Blog</a></li>
+    <li><a href="#">Privacy</a></li>
+    <li><a href="#">Terms</a></li>
+  </ul>
+  <div class="footer-copy">© 2025 ProposeAI, Inc.</div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    cursor.style.left = mouseX - 6 + 'px';
+    cursor.style.top = mouseY - 6 + 'px';
+  });
+
+  function animateRing() {
+    ringX += (mouseX - ringX - 18) * 0.12;
+    ringY += (mouseY - ringY - 18) * 0.12;
+    ring.style.left = ringX + 'px';
+    ring.style.top = ringY + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('button, a, .faq-item, .toggle').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'scale(2)';
+      ring.style.transform = 'scale(1.4)';
+      ring.style.opacity = '0.8';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'scale(1)';
+      ring.style.transform = 'scale(1)';
+      ring.style.opacity = '0.5';
+    });
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Billing toggle
+  let isAnnual = false;
+  function toggleBilling() {
+    isAnnual = !isAnnual;
+    const toggle = document.getElementById('billingToggle');
+    const mLabel = document.getElementById('monthlyLabel');
+    const aLabel = document.getElementById('annualLabel');
+    toggle.classList.toggle('on', isAnnual);
+    mLabel.classList.toggle('active', !isAnnual);
+    aLabel.classList.toggle('active', isAnnual);
+
+    document.querySelectorAll('.price-amount').forEach(el => {
+      const target = isAnnual ? el.dataset.annual : el.dataset.monthly;
+      animatePrice(el, parseInt(target));
+    });
+  }
+
+  function animatePrice(el, target) {
+    const start = parseInt(el.textContent);
+    const duration = 400;
+    const startTime = performance.now();
+    function step(now) {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(start + (target - start) * ease);
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // FAQ toggle
+  function toggleFaq(item) {
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  }
+</script>
+</body>
+</html>
